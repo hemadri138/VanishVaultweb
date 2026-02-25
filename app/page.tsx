@@ -52,7 +52,7 @@ export default function HomePage() {
               Start Free
             </Link>
             <Link href="/dashboard" className="rounded-xl border border-border bg-card px-5 py-2.5 text-sm">
-              Open Dashboard
+              Open Vault
             </Link>
           </div>
         </motion.div>

@@ -18,6 +18,7 @@ type AccessResponse = {
     signedUrl: string;
     selfDestructAfterView: boolean;
     selfDestructAfter10Sec: boolean;
+    requiresConsume: boolean;
     views: number;
     expiresAt: string;
   };
@@ -26,11 +27,12 @@ type AccessResponse = {
 export default function ViewFilePage({ params }: { params: { fileId: string } }) {
   const { user, loading } = useAuth();
   const [data, setData] = useState<AccessResponse['file'] | null>(null);
+  const [unlockedForView, setUnlockedForView] = useState(false);
   const [status, setStatus] = useState<'loading' | 'expired' | 'blocked' | 'destroyed' | 'ready'>('loading');
 
-  const fetchAccess = useCallback(async () => {
+  const fetchAccess = useCallback(async (intent: 'preview' | 'consume' = 'preview') => {
     const token = user ? await user.getIdToken() : null;
-    const response = await fetch(`/api/view/${params.fileId}`, {
+    const response = await fetch(`/api/view/${params.fileId}?intent=${intent}`, {
       headers: token ? { Authorization: `Bearer ${token}` } : {}
     });
 
@@ -45,6 +47,7 @@ export default function ViewFilePage({ params }: { params: { fileId: string } })
     }
 
     setData(payload.file);
+    setUnlockedForView(intent === 'consume' || !payload.file.requiresConsume);
     setStatus('ready');
   }, [params.fileId, user]);
 
@@ -67,14 +70,6 @@ export default function ViewFilePage({ params }: { params: { fileId: string } })
       setStatus('blocked');
     });
   }, [fetchAccess, loading]);
-
-  // First-view self destruct is triggered immediately after secure content is granted.
-  useEffect(() => {
-    if (!data?.selfDestructAfterView || status !== 'ready') return;
-    destroyNow().catch(() => {
-      toast.error('Self-destruct failed, try refreshing.');
-    });
-  }, [data?.selfDestructAfterView, destroyNow, status]);
 
   const viewerLabel = useMemo(() => user?.email ?? 'guest-viewer', [user?.email]);
 
@@ -126,9 +121,29 @@ export default function ViewFilePage({ params }: { params: { fileId: string } })
     <div className="no-select px-4 pb-10 pt-28">
       <div className="mx-auto mb-4 flex max-w-5xl items-center justify-between">
         <h1 className="text-lg font-semibold">Secure Viewer</h1>
-        {data.selfDestructAfter10Sec && <CountdownTimer seconds={10} onComplete={destroyNow} />}
+        {data.selfDestructAfter10Sec && unlockedForView && <CountdownTimer seconds={10} onComplete={destroyNow} />}
       </div>
-      <SecureViewer fileType={data.fileType} src={data.signedUrl} viewerLabel={viewerLabel} />
+      {data.selfDestructAfterView && data.requiresConsume && !unlockedForView ? (
+        <div className="mx-auto max-w-3xl rounded-2xl border border-amber-500/30 bg-amber-500/10 p-6 text-center">
+          <h2 className="text-lg font-semibold text-amber-300">One-time secure view</h2>
+          <p className="mt-2 text-sm text-amber-200/85">
+            This file is set to self-destruct after first view. Click below to open it once.
+          </p>
+          <button
+            type="button"
+            onClick={() =>
+              fetchAccess('consume').catch(() => {
+                toast.error('Unable to open secure file.');
+              })
+            }
+            className="mt-4 rounded-xl bg-primary px-4 py-2 text-sm font-medium text-white"
+          >
+            View Once
+          </button>
+        </div>
+      ) : (
+        <SecureViewer fileType={data.fileType} src={data.signedUrl} viewerLabel={viewerLabel} />
+      )}
     </div>
   );
 }

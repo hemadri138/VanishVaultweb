@@ -25,8 +25,14 @@ export function FloatingNavbar() {
         </Link>
 
         <div className="flex items-center gap-2">
+          <Link href="/" className="rounded-xl px-3 py-1.5 text-sm hover:bg-muted">
+            Home
+          </Link>
           <Link href="/dashboard" className="rounded-xl px-3 py-1.5 text-sm hover:bg-muted">
-            Dashboard
+            Vault
+          </Link>
+          <Link href="/privacy-policy" className="rounded-xl px-3 py-1.5 text-sm hover:bg-muted">
+            Privacy
           </Link>
           {!user ? (
             <Link href="/login" className="rounded-xl bg-primary px-4 py-1.5 text-sm font-medium text-white">

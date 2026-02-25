@@ -8,6 +8,7 @@ export async function GET(
   context: { params: { fileId: string } }
 ) {
   const { fileId } = context.params;
+  const intent = request.nextUrl.searchParams.get('intent') ?? 'preview';
 
   const authHeader = request.headers.get('authorization');
   const token = authHeader?.startsWith('Bearer ') ? authHeader.substring(7) : null;
@@ -61,12 +62,16 @@ export async function GET(
     return NextResponse.json({ ok: false, reason: 'destroyed' }, { status: 410 });
   }
 
-  const viewerIdentity = viewerEmail?.toLowerCase() ?? 'public-link';
-  // Views are incremented server-side to avoid trusting client-provided counters.
-  await docRef.update({
-    views: FieldValue.increment(1),
-    viewedBy: FieldValue.arrayUnion(viewerIdentity)
-  });
+  const shouldConsumeNow = !data.selfDestructAfterView || intent === 'consume';
+
+  if (shouldConsumeNow) {
+    const viewerIdentity = viewerEmail?.toLowerCase() ?? 'public-link';
+    // Views are incremented server-side to avoid trusting client-provided counters.
+    await docRef.update({
+      views: FieldValue.increment(1),
+      viewedBy: FieldValue.arrayUnion(viewerIdentity)
+    });
+  }
 
   const [signedUrl] = await adminStorage
     .bucket()
@@ -85,7 +90,8 @@ export async function GET(
       signedUrl,
       selfDestructAfterView: Boolean(data.selfDestructAfterView),
       selfDestructAfter10Sec: Boolean(data.selfDestructAfter10Sec),
-      views: (data.views ?? 0) + 1,
+      requiresConsume: Boolean(data.selfDestructAfterView) && intent !== 'consume',
+      views: shouldConsumeNow ? (data.views ?? 0) + 1 : data.views ?? 0,
       expiresAt: expiresAt.toISOString()
     }
   });

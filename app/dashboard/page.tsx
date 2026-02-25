@@ -86,7 +86,7 @@ export default function DashboardPage() {
   return (
     <div className="mx-auto max-w-6xl px-4 pb-16 pt-28">
       <div className="mb-6 rounded-2xl border border-border bg-card p-4 shadow-soft">
-        <h1 className="text-xl font-semibold">Dashboard</h1>
+        <h1 className="text-xl font-semibold">Vault</h1>
         <p className="text-sm text-fg/70">{activeCount} active file(s), {files.length} total uploads.</p>
       </div>
 
