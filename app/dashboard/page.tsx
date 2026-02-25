@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { collection, deleteDoc, doc, onSnapshot, orderBy, query, where } from 'firebase/firestore';
+import { signOut } from 'firebase/auth';
 import { deleteObject, ref } from 'firebase/storage';
 import toast from 'react-hot-toast';
 import { UploadCard } from '@/components/UploadCard';
@@ -10,7 +11,7 @@ import { FileCard } from '@/components/FileCard';
 import { LoadingSkeleton } from '@/components/LoadingSkeleton';
 import { SuccessModal } from '@/components/SuccessModal';
 import { useAuth } from '@/hooks/useAuth';
-import { db, storage } from '@/lib/firebase';
+import { auth, db, storage } from '@/lib/firebase';
 import { VaultFile } from '@/lib/types';
 
 export default function DashboardPage() {
@@ -23,6 +24,13 @@ export default function DashboardPage() {
 
   useEffect(() => {
     if (!loading && !user) {
+      router.push('/login?redirect=/dashboard');
+      return;
+    }
+
+    if (user && !user.emailVerified) {
+      toast.error('Verify your email before accessing Vault.');
+      signOut(auth);
       router.push('/login?redirect=/dashboard');
       return;
     }
