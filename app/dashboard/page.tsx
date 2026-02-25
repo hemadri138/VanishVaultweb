@@ -106,7 +106,12 @@ export default function DashboardPage() {
         ))}
       </section>
 
-      <SuccessModal open={modalOpen} link={generatedLink} onClose={() => setModalOpen(false)} />
+      <SuccessModal
+        open={modalOpen}
+        link={generatedLink}
+        onCopy={copyLink}
+        onClose={() => setModalOpen(false)}
+      />
     </div>
   );
 }

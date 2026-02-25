@@ -13,7 +13,10 @@ type SecureViewerProps = {
 
 export function SecureViewer({ fileType, src, viewerLabel }: SecureViewerProps) {
   const imageCanvasRef = useRef<HTMLCanvasElement | null>(null);
+  const pdfContainerRef = useRef<HTMLDivElement | null>(null);
   const [pdfPages, setPdfPages] = useState(0);
+  const [pdfWidth, setPdfWidth] = useState(900);
+  const [imageError, setImageError] = useState<string | null>(null);
 
   const watermarkText = useMemo(
     () => `${viewerLabel} - ${new Date().toLocaleString()}`,
@@ -45,20 +48,43 @@ export function SecureViewer({ fileType, src, viewerLabel }: SecureViewerProps) 
   }, []);
 
   useEffect(() => {
+    if (fileType !== 'pdf' || !pdfContainerRef.current) return;
+
+    const container = pdfContainerRef.current;
+    const updateWidth = () => {
+      // Keep PDF pages fully visible and responsive across mobile and desktop.
+      const nextWidth = Math.max(280, Math.min(1100, Math.floor(container.clientWidth - 32)));
+      setPdfWidth(nextWidth);
+    };
+
+    updateWidth();
+
+    const observer = new ResizeObserver(updateWidth);
+    observer.observe(container);
+    window.addEventListener('resize', updateWidth);
+
+    return () => {
+      observer.disconnect();
+      window.removeEventListener('resize', updateWidth);
+    };
+  }, [fileType]);
+
+  useEffect(() => {
     if (fileType !== 'image' || !imageCanvasRef.current) return;
 
     const canvas = imageCanvasRef.current;
     const ctx = canvas.getContext('2d');
     if (!ctx) return;
+    setImageError(null);
 
     const image = new Image();
-    image.crossOrigin = 'anonymous';
     image.src = src;
     image.onload = () => {
       canvas.width = image.width;
       canvas.height = image.height;
       ctx.drawImage(image, 0, 0);
 
+      ctx.save();
       ctx.font = '20px sans-serif';
       ctx.fillStyle = 'rgba(255,255,255,0.34)';
       ctx.rotate(-0.3);
@@ -68,11 +94,25 @@ export function SecureViewer({ fileType, src, viewerLabel }: SecureViewerProps) 
           ctx.fillText(watermarkText, x, y);
         }
       }
+      ctx.restore();
+    };
+    image.onerror = () => {
+      setImageError('Unable to load this image securely.');
     };
   }, [fileType, src, watermarkText]);
 
   if (fileType === 'image') {
-    return <canvas ref={imageCanvasRef} className="mx-auto max-h-[78vh] w-auto rounded-xl border border-border" />;
+    return (
+      <div className="mx-auto w-full max-w-5xl rounded-xl border border-border bg-card p-2">
+        {imageError ? (
+          <div className="grid min-h-[300px] place-items-center rounded-lg border border-rose-500/30 bg-rose-500/10 text-sm text-rose-300">
+            {imageError}
+          </div>
+        ) : (
+          <canvas ref={imageCanvasRef} className="h-auto w-full rounded-lg" />
+        )}
+      </div>
+    );
   }
 
   if (fileType === 'video') {
@@ -87,7 +127,7 @@ export function SecureViewer({ fileType, src, viewerLabel }: SecureViewerProps) 
   }
 
   return (
-    <div className="mx-auto max-w-4xl rounded-xl border border-border bg-card p-4">
+    <div ref={pdfContainerRef} className="mx-auto w-full max-w-5xl rounded-xl border border-border bg-card p-4">
       <Document file={src} onLoadSuccess={(pdf) => setPdfPages(pdf.numPages)}>
         {Array.from({ length: pdfPages }, (_, index) => (
           <Page
@@ -96,7 +136,7 @@ export function SecureViewer({ fileType, src, viewerLabel }: SecureViewerProps) 
             renderTextLayer={false}
             renderAnnotationLayer={false}
             className="mb-4 overflow-hidden rounded-lg border border-border"
-            width={900}
+            width={pdfWidth}
           />
         ))}
       </Document>

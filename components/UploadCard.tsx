@@ -6,7 +6,7 @@ import { doc, setDoc, Timestamp } from 'firebase/firestore';
 import { ref, uploadBytes } from 'firebase/storage';
 import Image from 'next/image';
 import toast from 'react-hot-toast';
-import { UploadCloud } from 'lucide-react';
+import { FileText, UploadCloud } from 'lucide-react';
 import { db, storage } from '@/lib/firebase';
 import { ExpirySelector } from '@/components/ExpirySelector';
 import { inferFileType } from '@/lib/utils';
@@ -132,11 +132,28 @@ export function UploadCard({ onUploadComplete }: UploadCardProps) {
               width={640}
               height={240}
               unoptimized
-              className="mt-3 h-36 w-full rounded-lg object-cover"
+              className="mt-3 h-auto max-h-[70vh] w-full rounded-lg object-contain bg-black/10"
             />
           )}
           {previewUrl && file.type.startsWith('video/') && (
-            <video src={previewUrl} className="mt-3 h-36 w-full rounded-lg object-cover" controls />
+            <video src={previewUrl} className="mt-3 h-auto max-h-[70vh] w-full rounded-lg object-contain bg-black/10" controls />
+          )}
+          {previewUrl && file.type === 'application/pdf' && (
+            <div className="mt-3 overflow-hidden rounded-lg border border-border bg-card">
+              <div className="flex items-center gap-2 border-b border-border px-3 py-2 text-xs text-fg/70">
+                <FileText size={14} />
+                PDF Preview
+              </div>
+              <object
+                data={`${previewUrl}#toolbar=0&navpanes=0&scrollbar=0`}
+                type="application/pdf"
+                className="h-[60vh] w-full"
+              >
+                <div className="flex h-40 items-center justify-center text-sm text-fg/70">
+                  PDF preview unavailable in this browser.
+                </div>
+              </object>
+            </div>
           )}
         </div>
       )}
