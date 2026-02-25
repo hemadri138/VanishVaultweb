@@ -45,7 +45,8 @@ export default function DashboardPage() {
           allowedEmails: data.allowedEmails ?? [],
           selfDestructAfterView: Boolean(data.selfDestructAfterView),
           selfDestructAfter10Sec: Boolean(data.selfDestructAfter10Sec),
-          views: data.views ?? 0
+          views: data.views ?? 0,
+          viewedBy: data.viewedBy ?? []
         } as VaultFile;
       });
 

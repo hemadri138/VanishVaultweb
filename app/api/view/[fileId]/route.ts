@@ -61,8 +61,12 @@ export async function GET(
     return NextResponse.json({ ok: false, reason: 'destroyed' }, { status: 410 });
   }
 
+  const viewerIdentity = viewerEmail?.toLowerCase() ?? 'public-link';
   // Views are incremented server-side to avoid trusting client-provided counters.
-  await docRef.update({ views: FieldValue.increment(1) });
+  await docRef.update({
+    views: FieldValue.increment(1),
+    viewedBy: FieldValue.arrayUnion(viewerIdentity)
+  });
 
   const [signedUrl] = await adminStorage
     .bucket()

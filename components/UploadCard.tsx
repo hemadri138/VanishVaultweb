@@ -89,7 +89,8 @@ export function UploadCard({ onUploadComplete }: UploadCardProps) {
         allowedEmails,
         selfDestructAfterView,
         selfDestructAfter10Sec,
-        views: 0
+        views: 0,
+        viewedBy: []
       });
 
       const link = `${window.location.origin}/view/${fileId}`;

@@ -12,6 +12,7 @@ export type VaultFile = {
   selfDestructAfterView: boolean;
   selfDestructAfter10Sec: boolean;
   views: number;
+  viewedBy: string[];
 };
 
 export type CreateFilePayload = {
@@ -22,4 +23,5 @@ export type CreateFilePayload = {
   allowedEmails: string[];
   selfDestructAfterView: boolean;
   selfDestructAfter10Sec: boolean;
+  viewedBy: string[];
 };

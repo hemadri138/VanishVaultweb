@@ -12,6 +12,7 @@ type FileCardProps = {
 
 export function FileCard({ file, onDelete, onCopy }: FileCardProps) {
   const expired = file.expiresAt.getTime() <= Date.now();
+  const viewedByLabel = file.viewedBy.length ? file.viewedBy.join(', ') : 'No viewers yet';
 
   return (
     <div className="rounded-2xl border border-border bg-card p-4 shadow-soft transition hover:-translate-y-0.5">
@@ -41,6 +42,7 @@ export function FileCard({ file, onDelete, onCopy }: FileCardProps) {
         </span>
         <span className="rounded-lg bg-muted px-2 py-1 text-fg/70">Views: {file.views}</span>
       </div>
+      <p className="mt-2 text-xs text-fg/65 break-all">Viewed by: {viewedByLabel}</p>
     </div>
   );
 }
