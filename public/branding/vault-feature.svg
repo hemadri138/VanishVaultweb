@@ -1,0 +1,31 @@
+<svg width="1024" height="500" viewBox="0 0 1024 500" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg2" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#2A2164"/>
+      <stop offset="100%" stop-color="#302A7A"/>
+    </linearGradient>
+    <linearGradient id="shield2" x1="0.5" y1="0" x2="0.5" y2="1">
+      <stop offset="0%" stop-color="#B18DFF"/>
+      <stop offset="100%" stop-color="#7A34F0"/>
+    </linearGradient>
+  </defs>
+
+  <rect width="1024" height="500" fill="url(#bg2)"/>
+
+  <g opacity="0.2" stroke="#6E69C8" stroke-width="1">
+    <path d="M0 64H1024M0 128H1024M0 192H1024M0 256H1024M0 320H1024M0 384H1024M0 448H1024"/>
+    <path d="M64 0V500M128 0V500M192 0V500M256 0V500M320 0V500M384 0V500M448 0V500M512 0V500M576 0V500M640 0V500M704 0V500M768 0V500M832 0V500M896 0V500M960 0V500"/>
+  </g>
+
+  <g transform="translate(120 120)">
+    <path d="M100 30L185 62V190C185 236 152 275 100 298C48 275 15 236 15 190V62L100 30Z" fill="url(#shield2)"/>
+    <rect x="70" y="138" width="60" height="42" rx="8" fill="#ECE8FF"/>
+    <path d="M80 143C80 131 89 122 100 122C111 122 120 131 120 143" stroke="#D6CCFF" stroke-width="8" stroke-linecap="round"/>
+    <circle cx="100" cy="151" r="5" fill="#6F34E9"/>
+    <rect x="98" y="155" width="4" height="8" rx="2" fill="#6F34E9"/>
+  </g>
+
+  <text x="420" y="190" fill="#F4F5FF" font-size="78" font-family="Arial, sans-serif" font-weight="700">VanishVault</text>
+  <text x="420" y="250" fill="#AFA0FF" font-size="48" font-family="Arial, sans-serif" font-weight="600">Self-Destructing Media</text>
+  <text x="420" y="310" fill="#B8AFFF" font-size="42" font-family="Arial, sans-serif" font-weight="500">Share • Vanish • Stay Private</text>
+</svg>

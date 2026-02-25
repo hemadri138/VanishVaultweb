@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { motion } from 'framer-motion';
 import { CloudUpload, EyeOff, ShieldCheck, TimerReset } from 'lucide-react';
 import { Footer } from '@/components/Footer';
@@ -54,6 +55,16 @@ export default function HomePage() {
             <Link href="/dashboard" className="rounded-xl border border-border bg-card px-5 py-2.5 text-sm">
               Open Vault
             </Link>
+          </div>
+          <div className="mx-auto mt-10 max-w-5xl overflow-hidden rounded-2xl border border-border shadow-soft">
+            <Image
+              src="/branding/vault-feature.svg"
+              alt="VanishVault Feature Graphic"
+              width={1024}
+              height={500}
+              priority
+              className="h-auto w-full"
+            />
           </div>
         </motion.div>
       </section>

@@ -1,8 +1,9 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-import { LogOut, Shield } from 'lucide-react';
+import { LogOut } from 'lucide-react';
 import { signOut } from 'firebase/auth';
 import { auth } from '@/lib/firebase';
 import { useAuth } from '@/hooks/useAuth';
@@ -20,7 +21,7 @@ export function FloatingNavbar() {
     <header className="fixed inset-x-0 top-4 z-40 mx-auto w-[95%] max-w-6xl rounded-2xl border border-border bg-card/80 px-4 py-3 shadow-soft backdrop-blur">
       <div className="flex items-center justify-between">
         <Link href="/" className="flex items-center gap-2 font-semibold tracking-tight">
-          <Shield size={18} className="text-primary" />
+          <Image src="/branding/vault-icon.svg" alt="VanishVault Icon" width={20} height={20} className="rounded" />
           VanishVault
         </Link>
 
