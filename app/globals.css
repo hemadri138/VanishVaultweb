@@ -1,0 +1,43 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --bg: 210 40% 98%;
+  --fg: 222 47% 11%;
+  --muted: 215 25% 94%;
+  --card: 0 0% 100%;
+  --primary: 214 84% 56%;
+  --border: 214 32% 90%;
+}
+
+.dark {
+  --bg: 222 47% 7%;
+  --fg: 210 40% 96%;
+  --muted: 220 28% 13%;
+  --card: 222 41% 11%;
+  --primary: 199 89% 55%;
+  --border: 217 25% 20%;
+}
+
+html,
+body {
+  min-height: 100%;
+  scroll-behavior: smooth;
+}
+
+body {
+  @apply bg-bg text-fg antialiased transition-colors duration-300;
+  font-family: 'Plus Jakarta Sans', 'Segoe UI', sans-serif;
+  background-image: radial-gradient(circle at 10% 10%, rgba(56, 189, 248, 0.12), transparent 30%),
+    radial-gradient(circle at 80% 20%, rgba(99, 102, 241, 0.1), transparent 25%);
+}
+
+.glass {
+  @apply border border-white/20 bg-white/10 backdrop-blur-xl dark:border-white/10 dark:bg-white/5;
+}
+
+.no-select {
+  -webkit-user-select: none;
+  user-select: none;
+}

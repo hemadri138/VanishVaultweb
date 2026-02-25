@@ -1,0 +1,28 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function isAuthed() {
+      return request.auth != null;
+    }
+
+    function isOwner(resourceData) {
+      return isAuthed() && request.auth.uid == resourceData.ownerId;
+    }
+
+    function emailAllowed(resourceData) {
+      return resourceData.allowedEmails.size() == 0 || (
+        isAuthed() && resourceData.allowedEmails.hasAny([request.auth.token.email])
+      );
+    }
+
+    function notExpired(resourceData) {
+      return resourceData.expiresAt > request.time;
+    }
+
+    match /files/{fileId} {
+      allow create: if isAuthed() && request.resource.data.ownerId == request.auth.uid;
+      allow read: if isOwner(resource.data) || (notExpired(resource.data) && emailAllowed(resource.data));
+      allow update, delete: if isOwner(resource.data);
+    }
+  }
+}
