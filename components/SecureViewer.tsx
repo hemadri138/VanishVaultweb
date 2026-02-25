@@ -16,6 +16,7 @@ export function SecureViewer({ fileType, src, viewerLabel }: SecureViewerProps) 
   const pdfContainerRef = useRef<HTMLDivElement | null>(null);
   const [pdfPages, setPdfPages] = useState(0);
   const [pdfWidth, setPdfWidth] = useState(900);
+  const [pdfError, setPdfError] = useState<string | null>(null);
   const [imageError, setImageError] = useState<string | null>(null);
 
   const watermarkText = useMemo(
@@ -49,6 +50,8 @@ export function SecureViewer({ fileType, src, viewerLabel }: SecureViewerProps) 
 
   useEffect(() => {
     if (fileType !== 'pdf' || !pdfContainerRef.current) return;
+    setPdfError(null);
+    setPdfPages(0);
 
     const container = pdfContainerRef.current;
     const updateWidth = () => {
@@ -128,18 +131,55 @@ export function SecureViewer({ fileType, src, viewerLabel }: SecureViewerProps) 
 
   return (
     <div ref={pdfContainerRef} className="mx-auto w-full max-w-5xl rounded-xl border border-border bg-card p-4">
-      <Document file={src} onLoadSuccess={(pdf) => setPdfPages(pdf.numPages)}>
-        {Array.from({ length: pdfPages }, (_, index) => (
-          <Page
-            key={index + 1}
-            pageNumber={index + 1}
-            renderTextLayer={false}
-            renderAnnotationLayer={false}
-            className="mb-4 overflow-hidden rounded-lg border border-border"
-            width={pdfWidth}
+      <div className="relative">
+        {!pdfError ? (
+          <Document
+            file={src}
+            onLoadSuccess={(pdf) => setPdfPages(pdf.numPages)}
+            onLoadError={() => setPdfError('PDF.js could not load this file.')}
+          >
+            {Array.from({ length: pdfPages }, (_, index) => (
+              <Page
+                key={index + 1}
+                pageNumber={index + 1}
+                renderTextLayer={false}
+                renderAnnotationLayer={false}
+                className="mb-4 overflow-hidden rounded-lg border border-border"
+                width={pdfWidth}
+              />
+            ))}
+          </Document>
+        ) : (
+          <div className="space-y-3">
+            <div className="rounded-lg border border-amber-500/35 bg-amber-500/10 p-3 text-sm text-amber-300">
+              {pdfError} Switched to embedded fallback viewer.
+            </div>
+            <iframe
+              src={`${src}#toolbar=0&navpanes=0&scrollbar=0`}
+              title="Secure PDF Viewer"
+              className="relative z-0 h-[78vh] w-full rounded-lg border border-border"
+            />
+          </div>
+        )}
+        <div className="pointer-events-none absolute inset-0 z-20 overflow-hidden rounded-lg">
+          <div className="absolute inset-0 bg-black/5" />
+          <div
+            className="absolute inset-0"
+            style={{
+              backgroundSize: '320px 180px',
+              backgroundImage:
+                'linear-gradient(-24deg, transparent 40%, rgba(255,255,255,0.08) 40%, rgba(255,255,255,0.08) 60%, transparent 60%)'
+            }}
           />
-        ))}
-      </Document>
+          <div className="absolute inset-0 grid grid-cols-2 gap-10 p-8 md:grid-cols-3">
+            {Array.from({ length: 9 }).map((_, index) => (
+              <div key={index} className="rotate-[-18deg] text-xs font-semibold text-white/38 md:text-sm">
+                {watermarkText}
+              </div>
+            ))}
+          </div>
+        </div>
+      </div>
       <div className="mt-2 text-center text-xs text-fg/60">Watermarked for {viewerLabel}</div>
     </div>
   );
